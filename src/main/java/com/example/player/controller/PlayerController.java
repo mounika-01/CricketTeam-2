@@ -1,43 +1,43 @@
-package com.example.player.controller;
-
-import org.springframework.beans.factory.annotation.Autowired;
+package com.example.player;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-
-import com.example.player.service.PlayerH2Service;
-
-import com.example.player.model.Player;
+import java.util.ArrayList;
+import com.example.player.PlayerService;
 
 @RestController
 public class PlayerController {
 
-     @Autowired
-     private PlayerH2Service playerService;
+    PlayerService playerservice = new PlayerService();
 
-     @GetMapping("/players")
-     public ArrayList<Player> getPlayers() {
-          return playerService.getPlayers();
-     }
+    @GetMapping("/players")
 
-     @GetMapping("/players/{playerId}")
-     public Player getPlayerById(@PathVariable("playerId") int playerId) {
-          return playerService.getPlayerById(playerId);
-     }
+    public ArrayList<Player> getPlayersList() {
+        return playerservice.getPlayers();
 
-     @PostMapping("/players")
-     public Player addPlayer(@RequestBody Player player) {
-          return playerService.addPlayer(player);
-     }
+    }
 
-     @PutMapping("/players/{playerId}")
-     public Player updatePlayer(@PathVariable("playerId") int playerId, @RequestBody Player player) {
-          return playerService.updatePlayer(playerId, player);
-     }
+    @GetMapping("/players/{playerId}")
+    public Player getPlayer(@PathVariable("playerId") int playerId) {
+        return playerservice.getPlayerById(playerId); // Update method call here
+    }
 
-     @DeleteMapping("/players/{playerId}")
-     public void deletePlayer(@PathVariable int playerId) {
-          playerService.deletePlayer(playerId);
-     }
+    @PostMapping("/players")
+
+    public Player addPlayer(@RequestBody Player player) {
+        return playerservice.addPlayer(player);
+    }
+
+    @PutMapping("/players/{playerId}")
+
+    public Player updatePlayer(@PathVariable("playerId") int playerId, @RequestBody Player player) {
+
+        return playerservice.updatePlayer(playerId, player);
+    }
+
+    @DeleteMapping("/players/{playerId}")
+
+    public void deletePlayer(@PathVariable("playerId") int playerId) {
+        playerservice.deletePlayer(playerId);
+    }
+
 }

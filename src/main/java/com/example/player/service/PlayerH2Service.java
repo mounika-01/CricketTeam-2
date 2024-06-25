@@ -1,77 +1,100 @@
-package com.example.player.service;
-
-import com.example.player.model.Player;
-import com.example.player.model.PlayerRowMapper;
-import com.example.player.repository.PlayerRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpStatus;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import org.springframework.stereotype.Service;
+package com.example.player;
 
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.*;
+import com.example.player.Player;
+import com.example.player.PlayerRepository;
 
-@Service
-public class PlayerH2Service implements PlayerRepository {
+// Don't modify the below code
 
-    @Autowired
-    private JdbcTemplate db;
+public class PlayerService implements PlayerRepository {
+
+    private static HashMap<Integer, Player> team = new HashMap<>();
+
+    public PlayerService() {
+        team.put(1, new Player(1, "Alexander", 5, "All-rounder"));
+        team.put(2, new Player(2, "Benjamin", 3, "All-rounder"));
+        team.put(3, new Player(3, "Michael", 18, "Batsman"));
+        team.put(4, new Player(4, "William", 45, "Batsman"));
+        team.put(5, new Player(5, "Joshua", 19, "Batsman"));
+        team.put(6, new Player(6, "Daniel", 10, "Bowler"));
+        team.put(7, new Player(7, "Matthew", 34, "Bowler"));
+        team.put(8, new Player(8, "Samuel", 17, "Batsman"));
+        team.put(9, new Player(9, "John", 1, "Bowler"));
+        team.put(10, new Player(10, "Earnest", 2, "All-rounder"));
+        team.put(11, new Player(11, "Bob", 25, "Batsman"));
+    }
+
+    int count = 12;
 
     @Override
     public ArrayList<Player> getPlayers() {
-        return (ArrayList<Player>) db.query("select * from team", new PlayerRowMapper());
+        Collection<Player> playerListCollection = team.values();
+        ArrayList<Player> PlayerList = new ArrayList<>(playerListCollection);
+        return PlayerList;
     }
 
     @Override
-    public Player getPlayerById(int playerId) {
 
-        try {
-            return db.queryForObject("select * from team where playerId = ?", new PlayerRowMapper(), playerId);
-
-        } catch (Exception e) {
-
+  @Override
+public Player getPlayerById(int playerId) {
+    // method implementation
+}
+        Player player = team.get(playerId);
+        if (player == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        return player;
     }
 
     @Override
-
     public Player addPlayer(Player player) {
-        db.update("insert into team(playerName, jerseyNumber, role) values (?,?,?)", player.getPlayerName(),
-                player.getJerseyNumber(), player.getRole());
-        return db.queryForObject("select * from team where playerName = ? and jersyNumber = ?", new PlayerRowMapper(),
-                player.getPlayerName(), player.getJerseyNumber());
+        player.setId(count);
+        team.put(count, player);
+        count += 1;
+        return player;
     }
-
-    @Override
-    public void deletePlayer(int playerId) {
-        db.update("delete from team where playerId = ?", playerId);
-    }
+    // System.out.println(team.size());
 
     @Override
 
     public Player updatePlayer(int playerId, Player player) {
+        Player existingPlayer = team.get(playerId);
+
+        if (existingPlayer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
         if (player.getPlayerName() != null) {
-
-            db.update("update team set playerName = ? where playerId=?", player.getPlayerName(), playerId);
-        }
-        if (player.getJerseyNumber() != 0) {
-
-            db.update("update team set jerseyNumber = ? where playerId =?", player.getJerseyNumber(), playerId);
-
+            existingPlayer.setPlayerName(player.getPlayerName());
         }
 
-        if (player.getRole() != null) {
-
-            db.update("update team set role = ? where playerId=?", player.getRole(), playerId);
+        if (player.getjerseyNumber() != 0) {
+            existingPlayer.setjerseyNumber(player.getjerseyNumber());
         }
-        return getPlayerById(playerId);
+
+        if (player.getrole() != null) {
+            existingPlayer.setrole(player.getrole());
+        }
+
+        return existingPlayer;
+
     }
 
+    @Override
+    public void deletePlayer(int playerId) {
+
+        Player existingPlayer = team.get(playerId);
+
+        if (existingPlayer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        } else {
+            team.remove(playerId);
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+        }
+
+    }
 }
